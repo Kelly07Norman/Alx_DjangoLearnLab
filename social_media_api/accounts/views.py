@@ -12,11 +12,11 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        headers = self.get_success_headers(serializer.data)
+        token, created = Token.objects.get_or_create(user=user)
         return Response({
-            'token': user.token,
-            'user': UserSerializer(user, context=self.get_serializer_context()).data
-        }, status=status.HTTP_201_CREATED, headers=headers)
+            "user": UserSerializer(user, context=self.get_serializer_context()).data,
+            "token": token.key
+        }, status=status.HTTP_201_CREATED)
 
 class LoginView(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
