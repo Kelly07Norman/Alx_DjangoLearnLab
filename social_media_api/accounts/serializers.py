@@ -5,9 +5,15 @@ from rest_framework.authtoken.models import Token
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
-    bio = serializers.CharField(required=False, allow_blank=True, max_length=255)
-    password = serializers.CharField(write_only=True, required=True) 
+    username = serializers.CharField(required=True)  
+    
+
+    bio = serializers.CharField(required=False, allow_blank=True, max_length=255)  
+    
+
+    password = serializers.CharField(write_only=True, required=True)  
+    
+
     profile_picture = serializers.ImageField(required=False)
 
     class Meta:
