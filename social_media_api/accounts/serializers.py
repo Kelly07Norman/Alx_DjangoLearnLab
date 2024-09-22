@@ -10,10 +10,11 @@ class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True)
+    token = serializers.CharField(read_only=True)
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password', 'password2', 'bio', 'profile_picture')
+        fields = ('id', 'username', 'email', 'password', 'password2', 'bio', 'profile_picture', 'token')
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
@@ -21,16 +22,8 @@ class UserSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        user = get_user_model().objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            password=validated_data['password'],
-            bio=validated_data.get('bio', ''),
-            profile_picture=validated_data.get('profile_picture', None)
-        )
+        validated_data.pop('password2')
+        user = User.objects.create_user(**validated_data)
+        token = Token.objects.create(user=user)
+        user.token = token.key
         return user
-
-class TokenSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Token
-        fields = ('key',)
