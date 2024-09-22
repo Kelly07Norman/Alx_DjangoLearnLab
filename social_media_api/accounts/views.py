@@ -53,3 +53,13 @@ class UnfollowUserView(generics.GenericAPIView):
         except CustomUser.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
+# The following method is included for completeness.
+# If you're using it, ensure that you have the necessary imports and logic.
+class ListUsersView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        users = CustomUser.objects.all()
+        user_data = [{"id": user.id, "username": user.username} for user in users]
+        return Response(user_data, status=status.HTTP_200_OK)
+
