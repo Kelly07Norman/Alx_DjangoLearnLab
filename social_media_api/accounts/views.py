@@ -30,7 +30,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .models import CustomUser
-from .serializers import CustomUserSerializer
 
 class FollowUserView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
