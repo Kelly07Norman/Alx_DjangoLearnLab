@@ -38,3 +38,34 @@ class FeedView(generics.GenericAPIView):
         posts = Post.objects.filter(author__in=following_users).order_by('-created_at')
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
+
+
+from django.shortcuts import get_object_or_404
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+from .models import Post, Like
+from notifications.models import Notification
+
+class LikePostView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
+        if created:
+            # Generate notification
+            Notification.objects.create(
+                recipient=post.author,
+                actor=request.user,
+                verb='liked',
+                target=post
+            )
+        return Response({'liked': True}, status=status.HTTP_200_OK)
+
+class UnlikePostView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        Like.objects.filter(user=request.user, post=post).delete()
+        return Response({'liked': False}, status=status.HTTP_200_OK)
