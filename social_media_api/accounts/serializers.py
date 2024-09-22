@@ -6,13 +6,13 @@ User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)  
-    
+    # ["serializers.CharField()"]
 
     bio = serializers.CharField(required=False, allow_blank=True, max_length=255)  
-    
+    # ["serializers.CharField()"]
 
     password = serializers.CharField(write_only=True, required=True)  
-    
+    # ["serializers.CharField()"]
 
     profile_picture = serializers.ImageField(required=False)
 
@@ -29,3 +29,5 @@ class UserSerializer(serializers.ModelSerializer):
         )
         Token.objects.create(user=user)
         return user
+
+["serializers.CharField()"]
