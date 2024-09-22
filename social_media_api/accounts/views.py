@@ -25,19 +25,29 @@ class LoginView(ObtainAuthToken):
             'email': user.email
         })
     
-    from rest_framework import generics, permissions
+from rest_framework import generics, permissions
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from .models import CustomUser
+from .serializers import CustomUserSerializer  # Assuming you have a serializer for the CustomUser
 
 @api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
 def follow_user(request, user_id):
-    user_to_follow = CustomUser.objects.get(id=user_id)
-    request.user.following.add(user_to_follow)
-    return Response({"message": "You are now following {}".format(user_to_follow.username)})
+    try:
+        user_to_follow = CustomUser.objects.get(id=user_id)
+        request.user.following.add(user_to_follow)
+        return Response({"message": "You are now following {}".format(user_to_follow.username)})
+    except CustomUser.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
 
 @api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
 def unfollow_user(request, user_id):
-    user_to_unfollow = CustomUser.objects.get(id=user_id)
-    request.user.following.remove(user_to_unfollow)
-    return Response({"message": "You have unfollowed {}".format(user_to_unfollow.username)})
+    try:
+        user_to_unfollow = CustomUser.objects.get(id=user_id)
+        request.user.following.remove(user_to_unfollow)
+        return Response({"message": "You have unfollowed {}".format(user_to_unfollow.username)})
+    except CustomUser.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+
