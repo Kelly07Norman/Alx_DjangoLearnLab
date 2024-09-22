@@ -32,7 +32,7 @@ from rest_framework import status
 from .models import CustomUser
 
 class FollowUserView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
         try:
@@ -43,7 +43,7 @@ class FollowUserView(generics.GenericAPIView):
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
 class UnfollowUserView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
         try:
@@ -56,7 +56,7 @@ class UnfollowUserView(generics.GenericAPIView):
 # The following method is included for completeness.
 # If you're using it, ensure that you have the necessary imports and logic.
 class ListUsersView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         users = CustomUser.objects.all()
