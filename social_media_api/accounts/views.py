@@ -1,7 +1,8 @@
-from rest_framework import generics, permissions, status , Token
+from rest_framework import generics, permissions, status
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from .serializers import UserSerializer
+from .serializers import UserSerializer, TokenSerializer
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = UserSerializer
@@ -11,7 +12,12 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        token, created = Token.objects.get_or_create(user=user)
+        token_serializer = TokenSerializer(token)
+        return Response({
+            "user": serializer.data,
+            "token": token_serializer.data
+        }, status=status.HTTP_201_CREATED)
 
 class LoginView(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
